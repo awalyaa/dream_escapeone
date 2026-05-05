@@ -1,0 +1,215 @@
+-- ============================================================
+-- DATABASE: dream_escapeone
+-- Sistem Wisata Dream Escape
+-- Update lengkap sesuai ERD di gambar 5 (DFD + ERD)
+-- ============================================================
+
+DROP DATABASE IF EXISTS dream_escapeone;
+CREATE DATABASE dream_escapeone CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE dream_escapeone;
+
+-- ------------------------------------------------------------
+-- TABEL 1: userone
+-- ERD gambar 5: id_user(PK), nm_pelengkap, email, password,
+-- no_telp, alamat, tgl_daftar, status
+-- Tambahan: google_id untuk fitur sambung Google
+-- ------------------------------------------------------------
+CREATE TABLE userone (
+    id_user       INT AUTO_INCREMENT PRIMARY KEY,
+    nm_pelengkap  VARCHAR(100) NOT NULL,
+    email         VARCHAR(100) NOT NULL UNIQUE,
+    password      VARCHAR(255) NOT NULL,
+    no_telp       VARCHAR(20)  DEFAULT NULL,
+    alamat        TEXT         DEFAULT NULL,
+    google_id     VARCHAR(255) DEFAULT NULL,
+    foto_profil   VARCHAR(255) DEFAULT NULL,
+    tgl_daftar    DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    status        ENUM('aktif','nonaktif') DEFAULT 'aktif'
+);
+
+-- ------------------------------------------------------------
+-- TABEL 2: destinasione
+-- ERD gambar 5: id_destinasi, nm_destinasr, deskripsi,
+-- lokasi, harga, gambar, fasilitas, status
+-- ------------------------------------------------------------
+CREATE TABLE destinasione (
+    id_destinasione     INT AUTO_INCREMENT PRIMARY KEY,
+    nama_destinasi      VARCHAR(150) NOT NULL,
+    kategori            VARCHAR(100) NOT NULL,
+    lokasi              VARCHAR(200) DEFAULT NULL,
+    deskripsi           TEXT,
+    harga               DECIMAL(12,0) NOT NULL,
+    diskon              VARCHAR(20)  DEFAULT NULL,
+    label_badge         VARCHAR(50)  DEFAULT NULL,
+    gambar_utama        VARCHAR(255) NOT NULL,
+    fasilitas_hotel     VARCHAR(255) DEFAULT NULL,
+    fasilitas_transport VARCHAR(255) DEFAULT NULL,
+    is_terlaris         TINYINT(1)   DEFAULT 0,
+    status              ENUM('aktif','nonaktif') DEFAULT 'aktif',
+    created_at          DATETIME     DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ------------------------------------------------------------
+-- TABEL 3: galeri_destinasione
+-- Galeri foto per spot wisata (sesuai sketsa gambar 2,3,4)
+-- Trenggalek: Pantai Mutiara, Pantai Prigi, Jembatan Mangrove
+-- Flores: Labuan Bajo, Wae Rebo, Mules Island
+-- Padang: 5 foto (Ngarai Sianok, Singkarak, dll)
+-- ------------------------------------------------------------
+CREATE TABLE galeri_destinasione (
+    id_galeri           INT AUTO_INCREMENT PRIMARY KEY,
+    id_destinasione     INT NOT NULL,
+    nama_spot           VARCHAR(150) DEFAULT NULL,
+    foto                VARCHAR(255) NOT NULL,
+    urutan              INT DEFAULT 0,
+    FOREIGN KEY (id_destinasione) REFERENCES destinasione(id_destinasione)
+);
+
+-- ------------------------------------------------------------
+-- TABEL 4: bookingone
+-- ERD gambar 5: id_booking, id_user, id_destinasi,
+-- tgl_berangkat, jmlh_peserta, total_harga, status_booking,
+-- tanggal_booking + kode_booking
+-- ------------------------------------------------------------
+CREATE TABLE bookingone (
+    id_booking          INT AUTO_INCREMENT PRIMARY KEY,
+    id_user             INT          DEFAULT NULL,
+    id_destinasione     INT          NOT NULL,
+    nama_pemesan        VARCHAR(100) NOT NULL,
+    email_pemesan       VARCHAR(100) NOT NULL,
+    no_hp               VARCHAR(20)  NOT NULL,
+    jmlh_peserta        INT          NOT NULL DEFAULT 1,
+    tgl_berangkat       DATE         NOT NULL,
+    total_harga         DECIMAL(14,0) NOT NULL,
+    kode_booking        VARCHAR(25)  NOT NULL UNIQUE,
+    status_booking      ENUM('pending','lunas','batal') DEFAULT 'pending',
+    tanggal_booking     DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_destinasione) REFERENCES destinasione(id_destinasione),
+    FOREIGN KEY (id_user) REFERENCES userone(id_user)
+);
+
+-- ------------------------------------------------------------
+-- TABEL 5: pembayaranone
+-- ERD gambar 5: id_pembayaran, id_booking, metode_bayar,
+-- jumlah_bayar, bukti_pembayaran, status_pembayaran,
+-- tanggal_bayar, keterangan
+-- ------------------------------------------------------------
+CREATE TABLE pembayaranone (
+    id_pembayaran       INT AUTO_INCREMENT PRIMARY KEY,
+    id_booking          INT          NOT NULL,
+    metode_bayar        VARCHAR(50)  NOT NULL,
+    jumlah_bayar        DECIMAL(14,0) NOT NULL,
+    bukti_pembayaran    VARCHAR(255) DEFAULT NULL,
+    status_pembayaran   ENUM('menunggu','berhasil','gagal') DEFAULT 'menunggu',
+    tanggal_bayar       DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    keterangan          TEXT         DEFAULT NULL,
+    FOREIGN KEY (id_booking) REFERENCES bookingone(id_booking)
+);
+
+-- ============================================================
+-- DATA DESTINASI
+-- Urutan: Bali(terlaris), Trenggalek(12%), Flores(terlaris),
+--         Bintan(terlaris), Yogyakarta(10%), Padang(10%)
+-- ============================================================
+INSERT INTO destinasione
+(nama_destinasi, kategori, lokasi, deskripsi, harga, diskon, label_badge, gambar_utama, fasilitas_hotel, fasilitas_transport, is_terlaris)
+VALUES
+('Bali','Pantai & Budaya','Bali, Indonesia',
+ 'Bali adalah pulau dewata yang terkenal di seluruh dunia dengan keindahan pantainya yang memukau, budaya Hindu yang kaya, sawah berteras yang hijau, dan kehidupan malam yang semarak. Nikmati sunset di Tanah Lot, berselancar di Pantai Kuta, menenangkan diri di Ubud, atau menjelajahi Pura Besakih yang megah.',
+ 3500000,NULL,'Terlaris','img/bali.png','Hotel Bintang 4 – 3 Malam','Shuttle Bus + Airport Transfer',1),
+
+('Trenggalek','Pantai & Alam','Trenggalek, Jawa Timur',
+ 'Trenggalek menyimpan kekayaan alam yang luar biasa di pesisir selatan Jawa Timur. Dari Pantai Mutiara yang tenang, Pantai Prigi yang ramai, hingga Jembatan Mangrove yang instagramable. Cocok untuk pecinta pantai dan alam tersembunyi.',
+ 1800000,'12%','Promo 12%','img/trenggalek.png','Penginapan Tepi Pantai – 2 Malam','Bus Pariwisata AC',0),
+
+('Flores','Alam & Petualangan','Flores, Nusa Tenggara Timur',
+ 'Flores adalah surga tersembunyi di Nusa Tenggara Timur. Mulai dari keajaiban bawah laut Labuan Bajo, desa adat Wae Rebo yang mistis di atas awan, hingga Pulau Mules yang berpasir putih. Flores wajib masuk bucket list petualanganmu!',
+ 4200000,NULL,'Terlaris','img/flores.png','Resort Tepi Pantai – 3 Malam','Kapal Wisata + Minibus',1),
+
+('Bintan','Pantai & Resort','Bintan, Kepulauan Riau',
+ 'Bintan adalah destinasi resort mewah yang hanya 1 jam dari Singapura. Pantai pasir putih panjang, air laut jernih, dan berbagai wahana air menjadikan Bintan pilihan utama untuk liburan keluarga maupun honeymoon.',
+ 2800000,NULL,'Terlaris','img/bintan.png','Beach Resort Bintang 4 – 2 Malam','Ferry + Shuttle Resort',1),
+
+('Yogyakarta','Budaya & Sejarah','Yogyakarta, DI Yogyakarta',
+ 'Yogyakarta adalah jantung budaya Jawa yang tidak pernah tidur. Kunjungi Candi Borobudur yang megah, Candi Prambanan yang romantis, Keraton Ngayogyakarta, dan jangan lupa cicipi Gudeg Bu Tjitro yang legendaris. Kota pelajar penuh kenangan!',
+ 1500000,'10%','Promo 10%','img/yogyakarta.png','Hotel Bintang 3 – 2 Malam','Kereta + City Tour Bus',0),
+
+('Padang','Kuliner & Alam','Padang, Sumatera Barat',
+ 'Padang bukan hanya soal Rendang yang mendunia. Kota ini menawarkan keindahan alam luar biasa: Ngarai Sianok yang dramatis, Danau Singkarak yang tenang, Pantai Air Manis dengan legenda Malin Kundang, dan kuliner Minangkabau asli yang tak tertandingi.',
+ 2100000,'10%','Promo 10%','img/padang.png','Hotel Bintang 3 – 2 Malam','Pesawat + Minibus Wisata',0);
+
+-- ============================================================
+-- DATA GALERI FOTO PER DESTINASI
+-- Sesuai sketsa:
+-- Gambar 2 (Trenggalek): Pantai Mutiara, Pantai Prigi, Jembatan Mangrove
+-- Gambar 3 (Flores): Labuan Bajo, Wae Rebo, Mules Island
+-- Gambar 4 (Padang): 5 foto spot
+-- Bali, Bintan, Yogyakarta: sesuaikan sendiri
+-- GANTI path foto setelah dapat foto dari teman
+-- ============================================================
+
+-- Galeri BALI (id_destinasione=1)
+INSERT INTO galeri_destinasione (id_destinasione, nama_spot, foto, urutan) VALUES
+(1,'Pantai Kuta',   'img/bali/kuta.png',      1),
+(1,'Tanah Lot',     'img/bali/tanahlot.png',  2),
+(1,'Ubud',          'img/bali/ubud.png',       3),
+(1,'Pura Besakih',  'img/bali/besakih.png',   4);
+
+-- Galeri TRENGGALEK (id_destinasione=2) — sketsa gambar 2
+-- Spot 1: Pantai Mutiara (4 foto)
+-- Spot 2: Pantai Prigi (4 foto)
+-- Spot 3: Jembatan Mangrove (4 foto)
+INSERT INTO galeri_destinasione (id_destinasione, nama_spot, foto, urutan) VALUES
+(2,'Pantai Mutiara',    'img/trenggalek/mutiara1.png',  1),
+(2,'Pantai Mutiara',    'img/trenggalek/mutiara2.png',  2),
+(2,'Pantai Mutiara',    'img/trenggalek/mutiara3.png',  3),
+(2,'Pantai Mutiara',    'img/trenggalek/mutiara4.png',  4),
+(2,'Pantai Prigi',      'img/trenggalek/prigi1.png',    5),
+(2,'Pantai Prigi',      'img/trenggalek/prigi2.png',    6),
+(2,'Pantai Prigi',      'img/trenggalek/prigi3.png',    7),
+(2,'Pantai Prigi',      'img/trenggalek/prigi4.png',    8),
+(2,'Jembatan Mangrove', 'img/trenggalek/mangrove1.png', 9),
+(2,'Jembatan Mangrove', 'img/trenggalek/mangrove2.png', 10),
+(2,'Jembatan Mangrove', 'img/trenggalek/mangrove3.png', 11),
+(2,'Jembatan Mangrove', 'img/trenggalek/mangrove4.png', 12);
+
+-- Galeri FLORES (id_destinasione=3) — sketsa gambar 3
+-- Spot 1: Labuan Bajo (4 foto)
+-- Spot 2: Wae Rebo (5 foto)
+-- Spot 3: Mules Island (4 foto)
+INSERT INTO galeri_destinasione (id_destinasione, nama_spot, foto, urutan) VALUES
+(3,'Labuan Bajo',  'img/flores/labuanbajo1.png', 1),
+(3,'Labuan Bajo',  'img/flores/labuanbajo2.png', 2),
+(3,'Labuan Bajo',  'img/flores/labuanbajo3.png', 3),
+(3,'Labuan Bajo',  'img/flores/labuanbajo4.png', 4),
+(3,'Wae Rebo',     'img/flores/waerebo1.png',    5),
+(3,'Wae Rebo',     'img/flores/waerebo2.png',    6),
+(3,'Wae Rebo',     'img/flores/waerebo3.png',    7),
+(3,'Wae Rebo',     'img/flores/waerebo4.png',    8),
+(3,'Wae Rebo',     'img/flores/waerebo5.png',    9),
+(3,'Mules Island', 'img/flores/mules1.png',      10),
+(3,'Mules Island', 'img/flores/mules2.png',      11),
+(3,'Mules Island', 'img/flores/mules3.png',      12),
+(3,'Mules Island', 'img/flores/mules4.png',      13);
+
+-- Galeri BINTAN (id_destinasione=4)
+INSERT INTO galeri_destinasione (id_destinasione, nama_spot, foto, urutan) VALUES
+(4,'Lagoi Bay',      'img/bintan/lagoi1.png',   1),
+(4,'Lagoi Bay',      'img/bintan/lagoi2.png',   2),
+(4,'Pantai Trikora', 'img/bintan/trikora1.png', 3),
+(4,'Pantai Trikora', 'img/bintan/trikora2.png', 4);
+
+-- Galeri YOGYAKARTA (id_destinasione=5)
+INSERT INTO galeri_destinasione (id_destinasione, nama_spot, foto, urutan) VALUES
+(5,'Candi Borobudur', 'img/yogyakarta/borobudur1.png', 1),
+(5,'Candi Borobudur', 'img/yogyakarta/borobudur2.png', 2),
+(5,'Candi Prambanan', 'img/yogyakarta/prambanan1.png', 3),
+(5,'Keraton Yogya',   'img/yogyakarta/keraton1.png',   4);
+
+-- Galeri PADANG (id_destinasione=6) — sketsa gambar 4 (5 foto)
+INSERT INTO galeri_destinasione (id_destinasione, nama_spot, foto, urutan) VALUES
+(6,'Ngarai Sianok',   'img/padang/sianok1.png',    1),
+(6,'Ngarai Sianok',   'img/padang/sianok2.png',    2),
+(6,'Danau Singkarak', 'img/padang/singkarak1.png', 3),
+(6,'Pantai Air Manis','img/padang/airmanis1.png',  4),
+(6,'Kuliner Padang',  'img/padang/kuliner1.png',   5);
