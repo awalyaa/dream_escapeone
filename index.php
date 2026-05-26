@@ -227,7 +227,6 @@
         <a href="index.php">🏠 Home</a>
         <a href="signinone.php">🔐 Sign In</a>
         <a href="signupone.php">📝 Sign Up</a>
-        <h1>lallalala</h1>
     </div>
 </nav>
 
