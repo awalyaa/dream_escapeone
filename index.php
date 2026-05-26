@@ -274,7 +274,7 @@
             $promo_text = ""; 
         }
         elseif(strpos($nama_lc, 'trenggalek') !== false) { 
-            $gambar_tampil = "Trenggalek.jpg"; 
+            $gambar_tampil = "trenggalek.jpg"; 
             $promo_text = "Promo 12%"; 
         }
         elseif(strpos($nama_lc, 'yogyakarta') !== false) { 
