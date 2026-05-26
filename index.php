@@ -52,7 +52,7 @@
         /* Hero Section */
         .hero { 
             height: 75vh; 
-            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('background.Png');
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('background.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -277,7 +277,7 @@
             $promo_text = ""; 
         }
         elseif(strpos($nama_lc, 'trenggalek') !== false) { 
-            $gambar_tampil = "Trenggalek.jpg"; 
+            $gambar_tampil = "trenggalek.jpg"; 
             $promo_text = "Promo 12%"; 
         }
         elseif(strpos($nama_lc, 'yogyakarta') !== false) { 

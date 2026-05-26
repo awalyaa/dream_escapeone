@@ -214,7 +214,6 @@ $isBali = (stripos($data['nama_destinasi'], 'Bali') !== false);
             background: var(--primary-blue); 
             margin: 10px auto; 
         }
-        
         .photo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 12px; }
         .photo-grid img { 
             width: 100%; height: 150px; object-fit: cover; border-radius: 15px; 
@@ -232,7 +231,6 @@ $isBali = (stripos($data['nama_destinasi'], 'Bali') !== false);
             position: absolute; top: 30px; right: 40px; color: white; font-size: 40px;
             cursor: pointer; transition: 0.3s;
         }
-
         .btn-booking { 
             display: block; text-align: center; 
             background: linear-gradient(135deg, #25d366, #128c7e); 
