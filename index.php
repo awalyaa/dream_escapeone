@@ -211,6 +211,8 @@
             color: white;
             transition: 0.3s;
         }
+
+
         .whatsapp-link:hover { color: #25D366; }
         .whatsapp-link i { font-size: 24px; }
 
@@ -225,6 +227,7 @@
         <a href="index.php">🏠 Home</a>
         <a href="signinone.php">🔐 Sign In</a>
         <a href="signupone.php">📝 Sign Up</a>
+        <h1>lallalala</h1>
     </div>
 </nav>
 
