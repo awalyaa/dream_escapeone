@@ -52,7 +52,7 @@
         /* Hero Section */
         .hero { 
             height: 75vh; 
-            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('background.Png');
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('backing.jpeg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -229,9 +229,6 @@
 </nav>
 
 <section class="hero">
-    <h1>Enjoy Your Trip</h1>
-    
-    <p>----find your best destination----</p>
 </section>
 
 <div class="filter-container">
